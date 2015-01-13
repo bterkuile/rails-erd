@@ -47,7 +47,7 @@ module RailsERD
     def normalize_value(key, value)
       case key
       # <symbol>[,<symbol>,...] | false
-      when :attributes
+      when :attributes, :only, :exclude
         if value == false
           return value
         else
@@ -64,7 +64,7 @@ module RailsERD
         !!value
 
       # nil | <string>
-      when :filename, :only, :exclude
+      when :filename
         value.nil? ? nil : value.to_s
 
       # true | false | <string>
