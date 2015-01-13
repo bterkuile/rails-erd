@@ -36,6 +36,7 @@ module RailsERD
 
     def load_file(path)
       if File.exists?(path)
+        require 'yaml'
         YAML.load_file(path).each do |key, value|
           key = key.to_sym
           @options[key] = normalize_value(key, value)

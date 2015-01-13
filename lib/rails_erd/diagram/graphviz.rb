@@ -268,9 +268,26 @@ module RailsERD
         if options.filetype.to_sym == :dot then :none else options.filetype.to_sym end
       end
 
+      #def entity_options(entity, attributes)
+        #label = options[:markup] ? "<#{read_template(:html).result(binding)}>" : "#{read_template(:record).result(binding)}"
+        #entity_style(entity, attributes).merge :label => label
+      #end
       def entity_options(entity, attributes)
-        label = options[:markup] ? "<#{read_template(:html).result(binding)}>" : "#{read_template(:record).result(binding)}"
-        entity_style(entity, attributes).merge :label => label
+        entity_options = (options[entity.model.name.underscore] || {}).symbolize_keys
+        entity_options[:fontcolor] = entity_options[:color] = :grey60 if entity.virtual?
+        entity_options[:style] ||= "filled" if entity_options[:fillcolor]
+        unless entity_options[:label]
+          entity_options[:label] = options[:markup] ? "<#{read_template(:html).result(binding)}>" : "#{read_template(:record).result(binding)}"
+          if entity_options[:shape] && !%w[mrecord record].include?(entity_options[:shape].to_s.underscore)
+            # html labels only supported for Mrecord and record
+            entity_options[:label] = read_template(:record).result(binding)
+            entity_options[:label].gsub!("\n", '\l')
+            if match = entity_options[:label].match(/([^|]+)\|/)
+              entity_options[:label].sub! match[0], "#{match[1]}\\l#{'-' * match[1].length}\\l"
+            end
+          end
+        end
+        entity_options
       end
 
       def relationship_options(relationship)
